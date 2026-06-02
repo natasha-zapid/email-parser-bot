@@ -3,7 +3,6 @@ const { App } = require('@slack/bolt');
 const { simpleParser } = require('mailparser');
 const http = require('http');
 
-// Start HTTP server first so Railway doesn't kill the process
 http.createServer((req, res) => res.end('ok')).listen(process.env.PORT || 3000, () => {
   console.log('HTTP server listening on port', process.env.PORT || 3000);
 });
@@ -13,6 +12,11 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
   appToken: process.env.SLACK_APP_TOKEN,
+  socketModeOptions: {
+    pingPongLoggingEnabled: false,
+    clientPingTimeout: 30000,
+    serverPingTimeout: 30000,
+  },
 });
 
 app.message(async ({ message, client }) => {
