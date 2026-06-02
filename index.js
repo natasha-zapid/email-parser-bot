@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { App } = require('@slack/bolt');
 const { simpleParser } = require('mailparser');
+const http = require('http');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -70,10 +71,10 @@ function cleanBody(text) {
   await app.start();
   console.log('Email parser bot running');
 
+  http.createServer((req, res) => res.end('ok')).listen(process.env.PORT || 3000);
+
   process.on('SIGTERM', async () => {
     await app.stop();
     process.exit(0);
   });
-
-  setInterval(() => {}, 1000 * 60 * 60);
 })();
