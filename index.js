@@ -53,19 +53,13 @@ async function fetchAndParse(url) {
 function cleanBody(text) {
   const lines = text.split('\n');
   const result = [];
-  
+
   for (const line of lines) {
-    // Stop at common signature delimiters
     if (/^--\s*$/.test(line)) break;
     if (/^_{3,}$/.test(line)) break;
-
-    // Skip forwarded-email header lines (e.g. "From: ...", "Sent: ...")
     if (/^(From|Sent|To|Cc|Subject|Date):\s+/i.test(line)) continue;
-
-    // Skip "Begin forwarded message" markers
     if (/begin forwarded message/i.test(line)) continue;
     if (/^>{1,2}\s*(From|Sent|To|Subject|Date):/i.test(line)) continue;
-
     result.push(line);
   }
 
@@ -75,4 +69,11 @@ function cleanBody(text) {
 (async () => {
   await app.start();
   console.log('Email parser bot running');
+
+  process.on('SIGTERM', async () => {
+    await app.stop();
+    process.exit(0);
+  });
+
+  setInterval(() => {}, 1000 * 60 * 60);
 })();
