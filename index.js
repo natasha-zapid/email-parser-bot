@@ -3,6 +3,11 @@ const { App } = require('@slack/bolt');
 const { simpleParser } = require('mailparser');
 const http = require('http');
 
+// Start HTTP server first so Railway doesn't kill the process
+http.createServer((req, res) => res.end('ok')).listen(process.env.PORT || 3000, () => {
+  console.log('HTTP server listening on port', process.env.PORT || 3000);
+});
+
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -78,8 +83,6 @@ function cleanBody(text) {
 (async () => {
   await app.start();
   console.log('Email parser bot running');
-
-  http.createServer((req, res) => res.end('ok')).listen(process.env.PORT || 3000);
 
   process.on('SIGTERM', async () => {
     await app.stop();
