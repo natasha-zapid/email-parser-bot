@@ -11,11 +11,19 @@ const app = new App({
 });
 
 app.message(async ({ message, client }) => {
-  if (!message.files?.length) return;
+  console.log('Message received:', JSON.stringify(message, null, 2));
+
+  if (!message.files?.length) {
+    console.log('No files attached, skipping');
+    return;
+  }
 
   const emailFiles = message.files.filter(f =>
     f.name?.endsWith('.eml') || f.name?.endsWith('.txt')
   );
+
+  console.log('Email files found:', emailFiles.length);
+
   if (!emailFiles.length) return;
 
   for (const file of emailFiles) {
